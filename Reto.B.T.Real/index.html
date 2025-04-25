@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuarios en Memoria</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #error {
+            color: red;
+        }
+        #lista-usuarios {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Registro de Usuarios</h1>
+    <form id="formulario-usuario">
+        <input type="text" id="nombre" placeholder="Nombre" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="number" id="edad" placeholder="Edad" required>
+        <button type="submit">Registrar</button>
+    </form>
+    <div id="error"></div>
+
+    <h2>Búsqueda de Usuarios</h2>
+    <input type="text" id="buscador" placeholder="Buscar por nombre">
+    
+    <ul id="lista-usuarios"></ul>
+    <p id="total-usuarios">Total: 0</p>
+
+    <script>
+        const usuarios = [];
+        const formulario = document.getElementById('formulario-usuario');
+        const listaUsuarios = document.getElementById('lista-usuarios');
+        const totalUsuarios = document.getElementById('total-usuarios');
+        const errorDiv = document.getElementById('error');
+        const buscador = document.getElementById('buscador');
+
+        formulario.addEventListener('submit', function(event) {
+            event.preventDefault();
+            errorDiv.textContent = ''; // Limpiar mensajes de error
+
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const edad = document.getElementById('edad').value.trim();
+
+            if (!nombre || !email || !edad) {
+                errorDiv.textContent = 'Todos los campos son obligatorios.';
+                return;
+            }
+
+            const usuario = { nombre, email, edad };
+            usuarios.push(usuario);
+            mostrarUsuarios();
+            formulario.reset(); // Limpiar el formulario
+        });
+
+        function mostrarUsuarios(filtrados = usuarios) {
+            listaUsuarios.innerHTML = ''; // Limpiar la lista existente
+            filtrados.forEach((usuario, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${usuario.nombre} (${usuario.email}, ${usuario.edad} años)`;
+                
+                // Añadir botón de eliminar
+                const btnEliminar = document.createElement('button');
+                btnEliminar.textContent = 'Eliminar';
+                btnEliminar.onclick = () => eliminarUsuario(index);
+                li.appendChild(btnEliminar);
+                
+                listaUsuarios.appendChild(li);
+            });
+
+            totalUsuarios.textContent = `Total: ${filtrados.length}`;
+        }
+
+        function eliminarUsuario(index) {
+            usuarios.splice(index, 1); // Eliminar usuario del array
+            mostrarUsuarios(); // Actualizar la lista
+        }
+
+        buscador.addEventListener('input', (e) => {
+            const busqueda = e.target.value.toLowerCase();
+            const usuariosFiltrados = usuarios.filter(user =>
+                user.nombre.toLowerCase().includes(busqueda)
+            );
+            mostrarUsuarios(usuariosFiltrados); // Mostrar solo los filtrados
+        });
+    </script>
+</body>
+</html>
